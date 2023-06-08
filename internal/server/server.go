@@ -15,6 +15,7 @@ func Start() {
 
 	http.HandleFunc("/login", authHandler.Login)
 	http.HandleFunc("/profile", userHandler.GetProfile)
+	http.HandleFunc("/refresh", userHandler.Refresh)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
