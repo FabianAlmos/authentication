@@ -2,7 +2,7 @@ package server
 
 import (
 	"authJWT/configs"
-	"authJWT/internal/endpoint"
+	handler "authJWT/internal/endpoint/handlers"
 	"authJWT/internal/middleware"
 	"authJWT/internal/router"
 	"net/http"
@@ -11,8 +11,8 @@ import (
 func Start() {
 	cfg := configs.NewConfig()
 
-	authHandler := endpoint.NewAuthHandler(cfg)
-	userHandler := endpoint.NewUserHandler(cfg)
+	authHandler := handler.NewAuthHandler(cfg)
+	userHandler := handler.NewUserHandler(cfg)
 
 	router := router.NewRouter()
 
