@@ -3,7 +3,8 @@ package server
 import (
 	"authJWT/configs"
 	"authJWT/internal/endpoint"
-	"log"
+	"authJWT/internal/middleware"
+	"authJWT/internal/router"
 	"net/http"
 )
 
@@ -13,9 +14,11 @@ func Start() {
 	authHandler := endpoint.NewAuthHandler(cfg)
 	userHandler := endpoint.NewUserHandler(cfg)
 
-	http.HandleFunc("/login", authHandler.Login)
-	http.HandleFunc("/profile", userHandler.GetProfile)
-	http.HandleFunc("/refresh", userHandler.Refresh)
+	router := router.NewRouter()
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	router.AddRoute("/login", authHandler.Login, nil)
+	router.AddRoute("/profile", userHandler.GetProfile, middleware.CheckAccessTokenValidity)
+	router.AddRoute("/refresh", userHandler.Refresh, nil)
+
+	http.ListenAndServe(":8080", router)
 }
