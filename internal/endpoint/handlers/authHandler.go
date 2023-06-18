@@ -109,10 +109,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		authHeader := r.Header.Get("Authorization")
-		tokenString := service.GetTokenFromBearerString(authHeader)
-
-		claims, err := service.ValidateToken(tokenString, h.cfg.RefreshTokenSecret)
+		claims, err := service.GetClaims(w, r, h.cfg.RefreshTokenSecret)
 		if err != nil {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return

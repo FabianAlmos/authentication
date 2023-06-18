@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"net/http"
 	"strings"
 	"time"
 
@@ -57,4 +58,12 @@ func ValidateToken(tokenString, secret string) (*JwtCustomClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func GetClaims(w http.ResponseWriter, r *http.Request, secret string) (*JwtCustomClaims, error) {
+	authHeader := r.Header.Get("Authorization")
+	tokenString := GetTokenFromBearerString(authHeader)
+
+	claims, err := ValidateToken(tokenString, secret)
+	return claims, err
 }
