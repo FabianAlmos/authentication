@@ -19,7 +19,7 @@ func Start() {
 	router.AddRoute("/login", authHandler.Login, nil)
 	router.AddRoute("/signup", authHandler.Register, nil)
 	router.AddRoute("/profile", userHandler.GetProfile, middleware.CheckAccessTokenValidity)
-	router.AddRoute("/refresh", userHandler.Refresh, nil)
+	router.AddRoute("/refresh", authHandler.Refresh, nil)
 
 	http.ListenAndServe(":8080", router)
 }

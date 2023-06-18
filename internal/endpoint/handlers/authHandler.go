@@ -55,7 +55,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		resp := response.LoginResponse{
+		resp := response.TokenPairResponse{
 			AccessToken:  accessString,
 			RefreshToken: refreshString,
 		}
@@ -99,5 +99,41 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	default:
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		authHeader := r.Header.Get("Authorization")
+		tokenString := service.GetTokenFromBearerString(authHeader)
+
+		claims, err := service.ValidateToken(tokenString, h.cfg.RefreshTokenSecret)
+		if err != nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		accessString, err := service.GenerateToken(claims.ID, h.cfg.AccessTokenLifetimeMinutes, h.cfg.AccessTokenSecret)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		refreshString, err := service.GenerateToken(claims.ID, h.cfg.RefreshTokenLifetimeMinutes, h.cfg.RefreshTokenSecret)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		resp := response.TokenPairResponse{
+			AccessToken:  accessString,
+			RefreshToken: refreshString,
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(resp)
+	default:
+		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
 	}
 }

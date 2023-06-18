@@ -48,39 +48,3 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
 	}
 }
-
-func (h *UserHandler) Refresh(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		authHeader := r.Header.Get("Authorization")
-		tokenString := service.GetTokenFromBearerString(authHeader)
-
-		claims, err := service.ValidateToken(tokenString, h.cfg.RefreshTokenSecret)
-		if err != nil {
-			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-			return
-		}
-
-		accessString, err := service.GenerateToken(claims.ID, h.cfg.AccessTokenLifetimeMinutes, h.cfg.AccessTokenSecret)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		refreshString, err := service.GenerateToken(claims.ID, h.cfg.RefreshTokenLifetimeMinutes, h.cfg.RefreshTokenSecret)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		resp := response.RefreshResponse{
-			AccessToken:  accessString,
-			RefreshToken: refreshString,
-		}
-
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(resp)
-	default:
-		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
-	}
-}
