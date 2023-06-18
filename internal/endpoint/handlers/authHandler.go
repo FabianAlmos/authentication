@@ -92,6 +92,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		password, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 
 		userRepo.Users = append(userRepo.Users, &model.User{
+			ID:       len(userRepo.Users),
 			Email:    req.Email,
 			Password: string(password),
 		})
