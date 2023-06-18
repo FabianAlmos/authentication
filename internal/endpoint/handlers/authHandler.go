@@ -8,6 +8,7 @@ import (
 	response "authJWT/internal/endpoint/responses"
 	"authJWT/internal/service"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -83,6 +84,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 		userRepo := repo.NewUserRepository()
 		for _, user := range userRepo.Users {
+			fmt.Println(user.ID, user.Email)
 			if user.Email == req.Email {
 				http.Error(w, "Email already in use!", http.StatusBadRequest)
 				return
@@ -92,7 +94,8 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		password, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 
 		userRepo.Users = append(userRepo.Users, &model.User{
-			ID:       len(userRepo.Users),
+			ID:       len(userRepo.Users) + 1,
+			Name:     req.Name,
 			Email:    req.Email,
 			Password: string(password),
 		})
