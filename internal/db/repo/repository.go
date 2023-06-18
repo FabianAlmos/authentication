@@ -11,17 +11,22 @@ type UserRepository struct {
 	Users []*model.User
 }
 
-func NewUserRepository() *UserRepository {
-	p1, _ := bcrypt.GenerateFromPassword([]byte("11111111"), bcrypt.DefaultCost)
-	p2, _ := bcrypt.GenerateFromPassword([]byte("22222222"), bcrypt.DefaultCost)
+var userRepoSingleton *UserRepository = nil
 
-	users := []*model.User{
-		{ID: 1, Name: "Alex", Email: "alex@example.com", Password: string(p1)},
-		{ID: 2, Name: "Mary", Email: "mary@example.com", Password: string(p2)},
+func NewUserRepository() *UserRepository {
+	if userRepoSingleton == nil {
+		p1, _ := bcrypt.GenerateFromPassword([]byte("11111111"), bcrypt.DefaultCost)
+		p2, _ := bcrypt.GenerateFromPassword([]byte("22222222"), bcrypt.DefaultCost)
+
+		users := []*model.User{
+			{ID: 1, Name: "Alex", Email: "alex@example.com", Password: string(p1)},
+			{ID: 2, Name: "Mary", Email: "mary@example.com", Password: string(p2)},
+		}
+		userRepoSingleton = &UserRepository{
+			Users: users,
+		}
 	}
-	return &UserRepository{
-		Users: users,
-	}
+	return userRepoSingleton
 }
 
 func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {

@@ -17,6 +17,7 @@ func Start() {
 	router := router.NewRouter()
 
 	router.AddRoute("/login", authHandler.Login, nil)
+	router.AddRoute("/signup", authHandler.Register, nil)
 	router.AddRoute("/profile", userHandler.GetProfile, middleware.CheckAccessTokenValidity)
 	router.AddRoute("/refresh", userHandler.Refresh, nil)
 
